@@ -10,19 +10,20 @@ import RemoveBackground from "./pages/RemoveBackground";
 import RemoveObject from "./pages/RemoveObject";
 import ReviewResume from "./pages/ReviewResume";
 import Community from "./pages/Community";
-import { useAuth } from "@clerk/clerk-react";
-// import { use } from "react";
-import { useEffect } from "react";
+// import { useAuth } from "@clerk/clerk-react";
+// import { useEffect } from "react";
+import {Toaster} from "react-hot-toast";
 
 const App = () => {
 
-  const {getToken} = useAuth()
-  useEffect(() => {
-    getToken().then((token) => console.log(token));
-  },[])
+  // const {getToken} = useAuth()
+  // useEffect(() => {
+  //   getToken().then((token) => console.log(token));
+  // },[])    //only for testing apis
 
   return (
     <div>
+      <Toaster/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/ai" element={<Layout />}>
