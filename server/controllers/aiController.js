@@ -142,7 +142,7 @@ export const generateImage = async (req, res) => {
 export const removeImageBackground = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { image } = req.file;
+    const image = req.file;
     const plan = req.plan;
 
     //only for premium users
@@ -175,7 +175,7 @@ export const removeImageObject = async (req, res) => {
   try {
     const { userId } = req.auth();
     const { object } = req.body;
-    const { image } = req.file;
+    const image = req.file;
     const plan = req.plan;
 
     //only for premium users
@@ -227,7 +227,19 @@ export const resumeReview = async (req, res) => {
 
     const pdfData = await pdf(dataBuffer);
 
-    const prompt = `Review the following resume and provide constructuive feedback on its strengths, weaknesses, and areas for improvement. The resume is as follows:\n\n ${pdfData.text}`;
+    // const prompt = `Review the following resume and provide constructuive feedback on its strengths, weaknesses, and areas for improvement. The resume is as follows:\n\n ${pdfData.text}`;
+    const prompt = `
+    You are an expert in resume optimization and ATS (Applicant Tracking System) compliance.
+    Review the following resume text and provide:
+    1. An ATS score (0–100) based on keyword usage, formatting, and structure for the target role.
+    2. Strengths that improve ATS compatibility.
+    3. Weaknesses that may cause ATS parsing issues (e.g., missing keywords, unusual formatting, graphics, tables).
+    4. Specific, actionable recommendations to improve ATS score — including keyword suggestions, section reformatting, and wording changes.
+    5. General improvements for human readability and impact.
+
+    Resume:
+    ${pdfData.text}
+    `;
 
     const response = await AI.chat.completions.create({
       model: "gemini-2.0-flash",
@@ -245,7 +257,7 @@ export const resumeReview = async (req, res) => {
 
     await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, 'Review the uploaded resume', ${content}, 'resume-review')`;
 
-    res.json({ success: true, content: imageUrl });
+    res.json({ success: true, content: content });
   } catch (error) {
     console.log(error.message);
     res.json({ success: false, message: error.message });
